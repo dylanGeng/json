@@ -1,5 +1,11 @@
 .PHONY: header_only
 
+BUILT_SOURCES = src/json.cc header_only/json.h
+
+# translate the regular expressions using RE2C
+src/json.cc: src/json.cc.re2c
+	$(AM_V_GEN)$(RE2C) -b -s -i -8 --no-generation-date -o$@ $<
+
 # the order is important: header before other sources
 CORE_SOURCES = src/json.h src/json.cc
 
@@ -16,14 +22,14 @@ json_parser_CXXFLAGS = -O3 -std=c++11 -flto
 json_parser_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/benchmark
 
 cppcheck:
-	cppcheck --enable=all --inconclusive --std=c++11 src/json.*
+	$(CPPCHECK) --enable=all --inconclusive --std=c++11 src/json.*
 
 svn-clean: maintainer-clean
 	rm -fr configure INSTALL aclocal.m4 build-aux depcomp install-sh missing test-driver
 	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done
 
 pretty:
-	astyle --style=allman --indent=spaces=4 --indent-modifiers \
+	$(ASTYLE) --style=allman --indent=spaces=4 --indent-modifiers \
 	   --indent-switches --indent-preproc-block --indent-preproc-define \
 	   --indent-col1-comments --pad-oper --pad-header --align-pointer=type \
 	   --align-reference=type --add-brackets --convert-tabs --close-templates \
@@ -34,6 +40,4 @@ parser:
 	make CXXFLAGS="" json_parser
 
 header_only/json.h: $(CORE_SOURCES)
-	cat $(CORE_SOURCES) | $(SED) 's/#include "json.h"//' > header_only/json.h
-
-BUILT_SOURCES = header_only/json.h
+	$(AM_V_GEN)cat $(CORE_SOURCES) | $(SED) 's/#include "json.h"//' > header_only/json.h
