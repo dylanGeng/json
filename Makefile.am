@@ -4,7 +4,7 @@ BUILT_SOURCES = src/json.cc header_only/json.h
 
 # translate the regular expressions using RE2C
 src/json.cc: src/json.cc.re2c
-	$(AM_V_GEN)$(RE2C) -b -s -i -8 --no-generation-date -o$@ $<
+	$(AM_V_GEN)$(RE2C) -b -s -i --no-generation-date -o$@ $<
 
 # the order is important: header before other sources
 CORE_SOURCES = src/json.h src/json.cc
