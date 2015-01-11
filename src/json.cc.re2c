@@ -1867,7 +1867,9 @@ json::parser::parser(const char* s)
 {
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    // set a pointer past the end of the buffer
     buffer_re2c_limit = buffer_re2c + buffer_.size();
+    // read first token
     get_token();
 
     // read first character
@@ -1882,7 +1884,9 @@ json::parser::parser(const std::string& s)
 {
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    // set a pointer past the end of the buffer
     buffer_re2c_limit = buffer_re2c + buffer_.size();
+    // read first token
     get_token();
 
     // read first character
@@ -1911,7 +1915,9 @@ json::parser::parser(std::istream& _is)
 
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    // set a pointer past the end of the buffer
     buffer_re2c_limit = buffer_re2c + buffer_.size();
+    // read first token
     get_token();
 
     // read first character
@@ -2002,6 +2008,9 @@ json::parser::token_type json::parser::get_token()
 
 /*!
 @return deserialized JSON object
+
+@todo Use dedicated error function.
+@todo Make sure that end of line is expected.
 
 @exception std::invalid_argument if a parse error occurs
 */

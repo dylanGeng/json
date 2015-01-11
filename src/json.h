@@ -475,9 +475,13 @@ class json
         /// the position inside the input buffer
         std::size_t pos_ = 0;
 
+        /// a pointer to the next character to read from the buffer
         const lexer_char_t* buffer_re2c = nullptr;
+        /// a pointer past the last character of the buffer
         const lexer_char_t* buffer_re2c_limit = nullptr;
+        /// a pointer to the beginning of the current token
         const lexer_char_t* current_re2c = nullptr;
+        /// the type of the last read token
         token_type last_token = token_type::uninitialized;
     };
 };
