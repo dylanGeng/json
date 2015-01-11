@@ -476,6 +476,7 @@ class json
         std::size_t pos_ = 0;
 
         const lexer_char_t* buffer_re2c = nullptr;
+        const lexer_char_t* buffer_re2c_limit = nullptr;
         const lexer_char_t* current_re2c = nullptr;
         token_type last_token = token_type::uninitialized;
     };

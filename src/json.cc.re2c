@@ -15,6 +15,7 @@
 #include <cstddef>    // std::size_t
 #include <stdexcept>  // std::runtime_error
 #include <utility>    // std::swap, std::move
+#include <cassert>    // debug
 
 namespace nlohmann
 {
@@ -1866,6 +1867,7 @@ json::parser::parser(const char* s)
 {
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    buffer_re2c_limit = buffer_re2c + buffer_.size();
     get_token();
 
     // read first character
@@ -1880,6 +1882,7 @@ json::parser::parser(const std::string& s)
 {
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    buffer_re2c_limit = buffer_re2c + buffer_.size();
     get_token();
 
     // read first character
@@ -1908,6 +1911,7 @@ json::parser::parser(std::istream& _is)
 
     // set buffer for RE2C
     buffer_re2c = reinterpret_cast<const lexer_char_t*>(buffer_.c_str());
+    buffer_re2c_limit = buffer_re2c + buffer_.size();
     get_token();
 
     // read first character
@@ -1930,15 +1934,18 @@ json::parser::token_type json::parser::get_token()
     // needed by RE2C
     const lexer_char_t* marker;
 
+    // todo: call the error member function
+#define YYFILL(n) {return last_token = token_type::parse_error;}
+
     // set up RE2C
     /*!re2c
         re2c:labelprefix     = "json_parser_";
-        re2c:yyfill:enable   = 0;
-        re2c:yyfill:check    = 1;
+        re2c:yyfill:enable   = 1;
         re2c:define:YYCURSOR = buffer_re2c;
         re2c:define:YYCTYPE  = lexer_char_t;
         re2c:define:YYMARKER = marker;
         re2c:indent:string   = "    ";
+        re2c:define:YYLIMIT  = buffer_re2c_limit;
     */
 
     for (;;)
@@ -2034,7 +2041,8 @@ json json::parser::new_parse()
                 // read next character
                 get_token();
             }
-            while (last_token == token_type::value_separator && get_token() == last_token);
+            while (last_token == token_type::value_separator
+                    and get_token() == last_token);
 
             // closing }
             expect_new(token_type::end_object);
@@ -2065,7 +2073,8 @@ json json::parser::new_parse()
                 // read next character
                 get_token();
             }
-            while (last_token == token_type::value_separator && get_token() == last_token);
+            while (last_token == token_type::value_separator
+                    and get_token() == last_token);
 
             // closing ]
             expect_new(token_type::end_array);
