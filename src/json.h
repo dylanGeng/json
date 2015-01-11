@@ -156,8 +156,10 @@ class json
 
     /// create from string representation
     static json parse(const std::string&);
+    static json new_parse(const std::string&);
     /// create from string representation
     static json parse(const char*);
+    static json new_parse(const char*);
 
   private:
     /// return the type as string
@@ -396,6 +398,28 @@ class json
     /// a helper class to parse a JSON object
     class parser
     {
+      private:
+        /// token types for the
+        enum class token_type
+        {
+            uninitialized,
+            literal_true,
+            literal_false,
+            literal_null,
+            value_string,
+            value_number,
+            begin_array,
+            begin_object,
+            end_array,
+            end_object,
+            name_separator,
+            value_separator,
+            parse_error
+        };
+
+        /// the type of a lexer character
+        using lexer_char_t = unsigned char;
+
       public:
         /// a parser reading from a C string
         parser(const char*);
@@ -413,8 +437,15 @@ class json
 
         /// parse and return a JSON object
         json parse();
+        json new_parse();
 
       private:
+        /// read the next token
+        token_type get_token();
+        /// get the current token's string
+        std::string get_string() const;
+        void expect_new(token_type);
+
         /// read the next character, stripping whitespace
         bool next();
         /// raise an exception with an error message
@@ -443,6 +474,10 @@ class json
         char current_ {};
         /// the position inside the input buffer
         std::size_t pos_ = 0;
+
+        const lexer_char_t* buffer_re2c = nullptr;
+        const lexer_char_t* current_re2c = nullptr;
+        token_type last_token = token_type::uninitialized;
     };
 };
 

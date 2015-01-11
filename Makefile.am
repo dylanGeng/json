@@ -9,7 +9,7 @@ src/json.cc: src/json.cc.re2c
 # the order is important: header before other sources
 CORE_SOURCES = src/json.h src/json.cc
 
-noinst_PROGRAMS = json_unit json_parser
+noinst_PROGRAMS = json_unit json_parser json_parser_new
 
 FLAGS = -Wall -Wextra -pedantic -Weffc++ -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-overflow=5 -Wswitch -Wundef -Wno-unused -Wnon-virtual-dtor -Wreorder
 
@@ -20,6 +20,10 @@ json_unit_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/test -Dprivate=public
 json_parser_SOURCES = $(CORE_SOURCES) benchmark/parse.cc
 json_parser_CXXFLAGS = -O3 -std=c++11 -flto
 json_parser_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/benchmark
+
+json_parser_new_SOURCES = $(CORE_SOURCES) benchmark/parse_new.cc
+json_parser_new_CXXFLAGS = -O3 -std=c++11 -flto
+json_parser_new_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/benchmark
 
 cppcheck:
 	$(CPPCHECK) --enable=all --inconclusive --std=c++11 src/json.*
@@ -34,7 +38,7 @@ pretty:
 	   --indent-col1-comments --pad-oper --pad-header --align-pointer=type \
 	   --align-reference=type --add-brackets --convert-tabs --close-templates \
 	   --lineend=linux --preserve-date --suffix=none \
-	   $(SOURCES)
+	   $(SOURCES) src/json.cc.re2c
 
 parser:
 	make CXXFLAGS="" json_parser
